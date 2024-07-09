@@ -1,0 +1,50 @@
+name: Run inblog
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *" # Runs at 00:00 UTC daily
+
+# allow only 1 concurrently
+concurrency:
+  group: "inblog"
+  cancel-in-progress: false
+
+jobs:
+  update-blog:
+    env:
+      INBLOG_EMAIL: ${{ secrets.INBLOG_EMAIL }}
+      INBLOG_PASSWORD: ${{ secrets.INBLOG_PASSWORD }}
+      INBLOG_APPROVED_SENDER: ${{ secrets.INBLOG_APPROVED_SENDER }}
+      INBLOG_IMAPSSERVER: ${{ secrets.INBLOG_IMAPSSERVER }}
+      INBLOG_MAILBOX: ${{ secrets.INBLOG_MAILBOX }}
+      INBLOG_NAME: ${{ secrets.INBLOG_NAME }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - name: Download inblog
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: "weebney/inblog"
+          version: "tags/v1.0"
+          file: "inblog-linux-amd64"
+
+      - name: Run inblog
+        run: |
+          chmod +x inblog-linux-amd64
+          ./inblog-linux-amd64 -m
+
+      - name: Cleanup inblog
+        run: |
+          rm -f inblog-linux-amd64
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Github Action"
+          git add .
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Add new blog posts" && git push)
