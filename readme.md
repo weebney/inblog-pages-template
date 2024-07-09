@@ -11,7 +11,9 @@
   - INBLOG_MAILBOX
   - INBLOG_APPROVED_SENDER
   - INBLOG_NAME
-6. Once these are set, go to the "Actions" tab of the repository
+6. Once these are set, click on "Pages" in the left menu
+1. Under "Build and deployment," click the source dropdown and select "GitHub Actions"
+1. In the top menu, go to the "Actions" tab of the repository
 1. In the menu on the left, click on "Run inblog"
 1. A blue banner should appear that reads "This workflow has a workflow_dispatch event trigger" ; on the right of the banner, click on "Run workflow" and then "Run workflow" in the dropdown menu
 1. This should build and deploy your blog.
